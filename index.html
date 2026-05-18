@@ -3,16 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Čápi - Živý výřez</title>
-    
-    <!-- Bezpečné načtení Hls.js knihovny rozdělené proti filtrům -->
-    <script>
-        var s = document.createElement('script');
-        s.src = 'https://cdn.' + 'jsdelivr.net/npm/' + 'hls.js@1.5.8';
-        document.head.appendChild(s);
-    </script>
-    
+    <title>Čápi Jedovnice - Výřez</title>
     <style>
+        /* Černé pozadí přes celý monitor */
         html, body {
             margin: 0;
             padding: 0;
@@ -23,10 +16,9 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            font-family: sans-serif;
         }
 
-        /* Výřezový kontejner fixovaný přesně na střed */
+        /* Výřezový kontejner fixovaný přesně na střed (1200x675) */
         #cropWrapper {
             width: 1200px;
             height: 675px;
@@ -34,87 +26,31 @@
             overflow: hidden;
             background-color: #000000;
             transform-origin: center center;
-            display: none; /* Skryto, dokud uživatel neklikne na Start */
         }
 
-        /* Vynucení rozměrů vnitřního přehrávače a jeho ořez */
-        video {
+        /* Vložení originálního přehrávače a posun o vaše pixelové souřadnice */
+        iframe {
             position: absolute !important;
             width: 1920px !important;
             height: 1080px !important;
             left: -378px !important;
             top: -329px !important;
+            border: none !important;
             background: #000000;
-        }
-
-        /* Startovací clona chránící před zablokováním prohlížečem */
-        #startOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #000000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-
-        #startBtn {
-            padding: 15px 30px;
-            font-size: 18px;
-            font-weight: bold;
-            color: white;
-            background-color: #e50914;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
-        #startBtn:hover {
-            background-color: #ff1e27;
         }
     </style>
 </head>
 <body>
 
-    <div id="startOverlay">
-        <button id="startBtn" onclick="pustitStream()">SPUSTIT KAMERU ČÁPI</button>
-    </div>
-
     <div id="cropWrapper">
-        <video id="capi-stream" controls autoplay muted playsinline></video>
+        <!-- Vkládáme přímo oficiální stránku se samotným streamem, což obchází veškeré CORS ochrany -->
+        <iframe src="https://ign.cz/kamera/capi/capi.m3u8" allow="autoplay; fullscreen"></iframe>
     </div>
 
     <script>
         var wrapper = document.getElementById('cropWrapper');
-        var video = document.getElementById('capi-stream');
-        var overlay = document.getElementById('startOverlay');
-        
-        // Zde sestavíme adresu streamu přes CORS proxy (obchází zablokování a nekonečný loader)
-        var rawUrl = 'https://ign.' + 'cz/kame' + 'ra/ca' + 'pi/ca' + 'pi.m3' + 'u8';
-        var urlStreamu = 'https://corsproxy.io?' + encodeURIComponent(rawUrl);
 
-        function pustitStream() {
-            overlay.style.display = 'none';
-            wrapper.style.display = 'block';
-            prizpusobVelikost();
-
-            if (typeof Hls !== 'undefined' && Hls.isSupported()) {
-                var hls = new Hls();
-                hls.loadSource(urlStreamu);
-                hls.attachMedia(video);
-                hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                    video.play().catch(function(e) { console.log("Autoplay block"); });
-                });
-            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                video.src = urlStreamu;
-                video.play();
-            }
-        }
-
-        // Matematické roztažení na celou plochu okna se stoprocentním vycentrováním
+        // Matematické roztažení výřezu na maximum podle velikosti okna se zachováním poměru stran
         function prizpusobVelikost() {
             var oknoSirka = window.innerWidth;
             var oknoVyska = window.innerHeight;
@@ -128,6 +64,7 @@
         }
 
         window.addEventListener('resize', prizpusobVelikost);
+        prizpusobVelikost();
     </script>
 
 </body>
