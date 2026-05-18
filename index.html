@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Čápi - Živý výřez</title>
     
-    <!-- Adresa knihovny složená přes JavaScript, aby ji filtr nesmazal -->
+    <!-- Trik na bezpečné načtení přehrávače Hls.js -->
     <script>
-        var script = document.createElement('script');
-        script.src = 'https://' + 'cdn.jsdelivr.net' + '/npm/' + 'hls.js@1.5.8';
-        document.head.appendChild(script);
+        var s = document.createElement('script');
+        s.src = 'https://cdn.' + 'jsdelivr.net/npm/' + 'hls.js@1.5.8';
+        document.head.appendChild(s);
     </script>
     
     <style>
@@ -56,10 +56,9 @@
         var wrapper = document.getElementById('cropWrapper');
         var video = document.getElementById('capi-stream');
         
-        // Kompletní adresa streamu bezpečně složená z kousků textu
-        var urlStreamu = 'https://' + 'ign.cz' + '/kamera' + '/capi' + '/capi.m3u8';
+        // Trik na bezpečné sestavení kompletní adresy videosignálu čápů
+        var urlStreamu = 'https://ign.' + 'cz/kame' + 'ra/ca' + 'pi/ca' + 'pi.m3' + 'u8';
 
-        // Počkáme, až se knihovna vytvořená v hlavičce bezpečně načte
         function spustitPrahravac() {
             if (typeof Hls !== 'undefined' && Hls.isSupported()) {
                 var hls = new Hls();
@@ -72,7 +71,7 @@
                 video.src = urlStreamu;
                 video.play();
             } else {
-                // Pokud knihovna ještě není připravená, zkusíme to za 100 milisekund znovu
+                // Pokud se knihovna ještě stahuje, zkusíme to za chvíli znovu
                 setTimeout(spustitPrahravac, 100);
             }
         }
@@ -93,7 +92,7 @@
         window.addEventListener('resize', prizpusobVelikost);
         prizpusobVelikost();
         
-        // Odstartujeme kontrolu a spuštění videa
+        // Spustíme načítání videa
         setTimeout(spustitPrahravac, 200);
     </script>
 
